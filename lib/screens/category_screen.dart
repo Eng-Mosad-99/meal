@@ -4,8 +4,13 @@ import '../data/dummy_data.dart';
 import '../models/meal.dart';
 
 class CategoriesScreen extends StatelessWidget {
-  const CategoriesScreen({super.key, required this.onToggleFavorite});
+  const CategoriesScreen({
+    super.key,
+    required this.onToggleFavorite,
+    required this.availableMeals,
+  });
   final void Function(Meal meal) onToggleFavorite;
+  final List<Meal> availableMeals;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +27,7 @@ class CategoriesScreen extends StatelessWidget {
           CatgeoryGridItem(
             categoryModel: category,
             onToggleFavorite: onToggleFavorite,
+            availableMeals: availableMeals,
           ),
       ],
     );

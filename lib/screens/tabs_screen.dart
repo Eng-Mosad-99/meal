@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:meal_app/constants.dart';
+import 'package:meal_app/data/dummy_data.dart';
 import 'package:meal_app/models/meal.dart';
 import 'package:meal_app/screens/category_screen.dart';
 import 'package:meal_app/screens/filter_screen.dart';
 import 'package:meal_app/screens/meals_screen.dart';
 import 'package:meal_app/widgets/main_drawer.dart';
+
+import '../widgets/snack_bar.dart';
 
 class TabScreen extends StatefulWidget {
   const TabScreen({super.key});
@@ -26,49 +30,59 @@ class _TabScreenState extends State<TabScreen> {
     if (isExisting == true) {
       setState(() {
         _favoriteMeals.remove(meal);
-        _showInfoMessage('Meal is no longer a favorite.');
+        showInfoMessage(context, 'Meal is no longer a favorite.');
       });
     } else {
       setState(() {
         _favoriteMeals.add(meal);
-        _showInfoMessage('Marked as a favorite!.');
+        showInfoMessage(context, 'Marked as a favorite!.');
       });
     }
   }
+
+  Map<Filter, bool> _selectedFilter = kInitialFilter;
+  
 
   void _setScreen(String identifier) {
     if (identifier == 'Filters') {
       Navigator.of(context).pop();
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (ctx) => const FiltersScreen(),
-        ),
-      );
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(
+              builder: (ctx) => FiltersScreen(
+                currentFilter: _selectedFilter,
+              ),
+            ),
+          )
+          .then(
+            (value) =>
+                setState(() => _selectedFilter = value ?? kInitialFilter),
+          );
     } else {
       Navigator.of(context).pop();
     }
   }
 
-  _showInfoMessage(String message) {
-    ScaffoldMessenger.of(context)
-        .clearSnackBars(); //علشان احذف اي snackbar قبل كده
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: Colors.white,
-              ),
-        ),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final availableMeals = dummyMeals.where((meal) {
+      if (_selectedFilter[Filter.glutenFree]! && !meal.isGlutenFree) {
+        return false;
+      }
+      if (_selectedFilter[Filter.lactoseFree]! && !meal.isLactoseFree) {
+        return false;
+      }
+      if (_selectedFilter[Filter.vegan]! && !meal.isVegan) {
+        return false;
+      }
+      if (_selectedFilter[Filter.vegetarian]! && !meal.isVegetarian) {
+        return false;
+      }
+      return true;
+    }).toList();
     Widget activePage = CategoriesScreen(
+      availableMeals: availableMeals,
       onToggleFavorite: _toggleFavoriteMealStatus,
     );
     String activePageTitle = 'Pick your categories';

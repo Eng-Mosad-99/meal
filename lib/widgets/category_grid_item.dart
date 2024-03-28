@@ -6,16 +6,19 @@ import 'package:meal_app/screens/meals_screen.dart';
 
 class CatgeoryGridItem extends StatelessWidget {
   const CatgeoryGridItem(
-      {super.key, required this.categoryModel, required this.onToggleFavorite});
+      {super.key,
+      required this.categoryModel,
+      required this.onToggleFavorite,
+      required this.availableMeals});
 
   final CategoryModel categoryModel;
   final void Function(Meal) onToggleFavorite;
-
+  final List<Meal> availableMeals;
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        final List<Meal> filteredMeal = dummyMeals
+        final List<Meal> filteredMeal = availableMeals
             .where(
               (meal) => meal.categories.contains(categoryModel.id),
             )
